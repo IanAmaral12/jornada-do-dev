@@ -44,6 +44,17 @@ public class FaseJuniorTests
     }
 
     [UnityTest]
+    public IEnumerator NovaPergunta_LimpaBotaoSelecionado_ParaEnterNaoResponderSozinho()
+    {
+        yield return CarregarEEntrarEmCombate();
+        var botao = Object.FindObjectsByType<UnityEngine.UI.Button>(FindObjectsSortMode.None).First(b => b.name == "Opcao1");
+        UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(botao.gameObject);
+        painel.Responder((painel.PerguntaAtual.correctIndex + 1) % 4);
+        yield return Esperar(() => painel.AguardandoResposta, 8f, "a segunda pergunta não apareceu");
+        Assert.IsNull(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject);
+    }
+
+    [UnityTest]
     public IEnumerator AcertarDuasVezes_DerrotaMob_ELiberaHeroi()
     {
         yield return CarregarEEntrarEmCombate();

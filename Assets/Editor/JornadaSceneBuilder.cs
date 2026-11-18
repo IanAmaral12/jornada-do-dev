@@ -90,7 +90,8 @@ public static class JornadaSceneBuilder
     static void CarregarRecursos()
     {
         fontePixel = AssetDatabase.LoadAssetAtPath<Font>("Assets/Kenney/Fonts/KenneyPixel.ttf");
-        fonteCodigo = AssetDatabase.LoadAssetAtPath<Font>("Assets/Kenney/Fonts/KenneyMini.ttf");
+        // a fonte pixel desenha "*" e ")" de forma ambígua; o código precisa ser legível
+        fonteCodigo = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
         string caminhoBranco = $"{Gen}/branco.png";
         if (!File.Exists(caminhoBranco))

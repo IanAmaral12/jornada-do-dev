@@ -40,6 +40,15 @@ public class QuestionBankTests
         Assert.AreEqual("b", bank.Next(Tier.Junior, true).id);
         Assert.AreEqual("c", bank.Next(Tier.Pleno, true).id);
         Assert.AreEqual(1, bank.Count(Tier.Junior, true));
+        Assert.AreEqual(1, bank.Count(Tier.Junior, false));
+    }
+
+    [Test]
+    public void Next_Mob_NeverServesBossQuestionsWhenRegularOnesExist()
+    {
+        var bank = QuestionBank.FromJson(Set(Q("a", "Junior", false), Q("b", "Junior", false), Q("chefe", "Junior", true)), new System.Random(5));
+        for (int i = 0; i < 30; i++)
+            Assert.IsFalse(bank.Next(Tier.Junior, false).boss);
         Assert.AreEqual(2, bank.Count(Tier.Junior, false));
     }
 
@@ -58,7 +67,7 @@ public class QuestionBankTests
         var bank = QuestionBank.FromJson(asset.text, new System.Random(1));
         foreach (Tier t in Enum.GetValues(typeof(Tier)))
         {
-            Assert.GreaterOrEqual(bank.Count(t, false), 10, t.ToString());
+            Assert.GreaterOrEqual(bank.Count(t, false), 7, t.ToString());
             Assert.GreaterOrEqual(bank.Count(t, true), 3, t.ToString());
         }
     }

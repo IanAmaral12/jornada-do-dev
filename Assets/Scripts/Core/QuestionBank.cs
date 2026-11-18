@@ -54,8 +54,7 @@ public class QuestionBank
     List<PythonQuestion> Pool(Tier tier, bool boss)
     {
         var doTier = all.Where(q => q.TierValue == tier).ToList();
-        if (!boss) return doTier;
-        var deBoss = doTier.Where(q => q.boss).ToList();
-        return deBoss.Count > 0 ? deBoss : doTier;
+        var filtradas = doTier.Where(q => q.boss == boss).ToList();
+        return filtradas.Count > 0 ? filtradas : doTier;
     }
 }
