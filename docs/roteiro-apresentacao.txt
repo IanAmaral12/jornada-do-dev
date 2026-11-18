@@ -1,0 +1,235 @@
+JORNADA DO DEV - ROTEIRO DA APRESENTAÇÃO
+=========================================
+Apoio para falar de cada slide. Tempo total: até 15 minutos (cerca de 50 segundos por slide).
+Dica: não leia o código linha por linha. Aponte as 2 ou 3 linhas que importam e conte o que elas fazem.
+
+
+SLIDE 1 - Capa
+--------------
+O que dizer:
+- "Jornada do Dev" é um jogo 2D em estilo 8-bit feito na Unity.
+- O herói é um programador que sobe de carreira: Junior, Pleno e Senior.
+- Em vez de lutar apertando botão, cada luta abre uma pergunta de Python.
+  Acertou: o herói bate. Errou: o herói apanha e perde coração.
+- Vou mostrar o código das 3 mecânicas principais: movimentação, quiz e ataque.
+
+Em termos simples:
+- Unity é o motor do jogo; o código é em C#.
+- As perguntas são de Python, mas o jogo não executa Python: o jogador lê o código e escolhe a resposta.
+
+
+SLIDE 2 - Do teclado ao golpe: quem chama quem
+----------------------------------------------
+O que dizer:
+- Esse é o caminho de uma jogada, da esquerda para a direita.
+- O teclado avisa o PlayerController, que move o herói.
+- Quando o herói chega perto de um inimigo, o inimigo pede o combate ao CombatManager.
+- O CombatManager pega uma pergunta e manda o TaskPanel mostrar na tela.
+- A resposta vai para o CombatEncounter, que decide se acertou ou errou.
+- O CombatFx faz a animação do golpe.
+
+Em termos simples:
+- Cada caixa é um script (uma classe) com uma única responsabilidade.
+- Separar assim facilita entender, testar e corrigir: se o golpe está estranho, sei que é no CombatFx.
+
+
+SLIDE 3 - Divisor: 1 · Movimentação
+-----------------------------------
+O que dizer:
+- Primeira mecânica: andar e pular. Segue o mesmo padrão do PlayerController visto em aula.
+
+
+SLIDE 4 - O Input System avisa o player por eventos
+---------------------------------------------------
+O que dizer:
+- Uso o Input System novo da Unity. As teclas ficam configuradas num arquivo
+  (.inputactions) e a Unity gera a classe PlayerControls.
+- No OnEnable eu "assino" os eventos: quando o jogador aperta mover ou pular, a Unity chama meus métodos.
+- OnMove só guarda a direção. OnJump só anota "pulo pedido", e só se o herói estiver no chão.
+- O movimento de verdade acontece depois, na física.
+- InputLocked: durante o quiz o herói fica travado, não anda nem pula.
+
+Em termos simples:
+- Evento = "me avisa quando acontecer", em vez de ficar perguntando a todo momento se a tecla foi apertada.
+- No OnDisable eu cancelo a assinatura, para não sobrar evento ligado quando troca de cena.
+
+
+SLIDE 5 - Update: chão e Animator a cada quadro
+-----------------------------------------------
+O que dizer:
+- Update roda uma vez por quadro (dezenas de vezes por segundo).
+- OverlapCircle desenha um círculo invisível no pé do herói e pergunta: "tem chão aqui?".
+- Depois envio três valores para o Animator: velocidade, velocidade vertical e se está no chão.
+- O Animator usa esses valores para escolher a animação: parado (Idle), correndo (Run) ou pulando (Jump).
+
+Em termos simples:
+- O código não "toca" animação diretamente. Ele só informa números, e o Animator decide qual animação usar.
+
+
+SLIDE 6 - FixedUpdate: velocidade, direção e pulo
+-------------------------------------------------
+O que dizer:
+- FixedUpdate roda no ritmo da física, por isso mexo no Rigidbody2D aqui.
+- A velocidade horizontal vem da tecla; a vertical eu mantenho, para a gravidade continuar agindo.
+- flipX espelha o desenho do herói para ele olhar para o lado em que anda.
+- O pulo é um "empurrão" para cima (impulso), aplicado uma vez só.
+- A gravidade é mais forte na queda (6) do que na subida (2). Isso deixa o pulo firme,
+  sem aquela sensação de flutuar. Mesma técnica da aula.
+
+Em termos simples:
+- Rigidbody2D = o componente que dá física ao personagem (peso, gravidade, colisão).
+- Update é para o que é visual; FixedUpdate é para o que é física.
+
+
+SLIDE 7 - Divisor: 2 · Quiz de Python
+-------------------------------------
+O que dizer:
+- Segunda mecânica: o combate por perguntas. A ordem é a mostrada embaixo do título:
+  o inimigo percebe o herói, o CombatManager conduz, o TaskPanel mostra e o CombatEncounter julga.
+
+
+SLIDE 8 - O inimigo persegue e pede o combate
+---------------------------------------------
+O que dizer:
+- O inimigo tem uma máquina de estados, igual à da aula de NavMesh, mas adaptada para 2D.
+- Estados: Patrol (anda de um ponto A até um ponto B), Chase (corre atrás do herói) e Combat (parado durante o quiz).
+- No estado Chase, a cada quadro ele mede a distância até o herói.
+  Se ficou perto, para e pede o combate. Se o pedido for aceito, muda para Combat.
+- Se o herói se afastar muito, ele desiste e volta a patrulhar.
+
+Em termos simples:
+- Máquina de estados = o inimigo está sempre em um "modo", e cada modo tem suas regras e quando trocar de modo.
+
+
+SLIDE 9 - Uma corrotina conduz o combate inteiro
+------------------------------------------------
+O que dizer:
+- O combate é uma corrotina: uma função que pode pausar e continuar depois, sem travar o jogo.
+- O laço repete enquanto ninguém morreu:
+  1. sorteia uma pergunta da fase (o boss recebe perguntas mais difíceis);
+  2. mostra na tela e espera a resposta (WaitUntil);
+  3. julga e mostra se acertou, com a explicação quando erra;
+  4. esconde o painel e toca a animação do golpe;
+  5. repete.
+- No fim: se o inimigo morreu, o herói é liberado; se for o boss, a porta da próxima fase abre.
+  Se o herói morreu, aparece o Game Over.
+
+Em termos simples:
+- "yield return" é o ponto onde a corrotina pausa e espera; o resto do jogo continua rodando enquanto isso.
+
+
+SLIDE 10 - A regra do acerto é C# puro e testado
+------------------------------------------------
+O que dizer:
+- A decisão de acertou ou errou fica numa classe separada, sem nada de Unity.
+- Se a opção escolhida é a correta, o inimigo perde vida; senão, o herói perde corações.
+- Ela devolve um de cinco resultados: acertou, errou, inimigo derrotado, herói derrotado ou ignorado.
+- Logo depois de julgar, a pergunta atual é apagada (Current = null).
+  Assim, um clique duplo não dá dano duas vezes: a segunda resposta é ignorada.
+- Por não depender da Unity, essa regra tem testes automáticos.
+
+Em termos simples:
+- Teste automático = um código que confere sozinho se a regra funciona, sem eu precisar jogar.
+
+
+SLIDE 11 - 30 perguntas conferidas no Python 3.14
+-------------------------------------------------
+O que dizer:
+- As perguntas ficam num arquivo JSON: 10 por fase, 3 delas de boss.
+- Junior: contas e precedência. Pleno: textos, listas e laços. Senior: funções, recursão e closure.
+- O QuestionBank embaralha as perguntas numa fila e tira uma por vez, então não repete
+  até acabar. Quando acaba, embaralha de novo, sem repetir a última que saiu.
+- Para garantir que o gabarito está certo, um script executa cada pergunta no Python 3.14
+  e compara com a resposta marcada como correta.
+
+Em termos simples:
+- JSON = arquivo de texto com dados organizados. Dá para adicionar perguntas sem mexer no código.
+
+
+SLIDE 12 - O painel trava antes de avisar a resposta
+----------------------------------------------------
+O que dizer:
+- O TaskPanel é só a parte visual do quiz.
+- Show preenche o nome do inimigo, a pergunta, o código colorido e as 4 alternativas.
+- Responder é chamado pelo clique e também pelas teclas 1 a 4.
+  Ele trava o painel primeiro e só depois avisa a resposta, pelo evento Answered.
+- O painel não sabe nada do combate: ele só avisa "escolheram a opção X", e o CombatManager decide o resto.
+
+Em termos simples:
+- O título no topo do painel é o NOME do inimigo (por exemplo "Syntax Error"), não uma mensagem de erro.
+- O código colorido é feito pelo PythonHighlighter: palavras-chave em rosa, números em roxo, textos em amarelo.
+
+
+SLIDE 13 - Divisor: 3 · Animação de ataque
+------------------------------------------
+O que dizer:
+- Terceira mecânica: o golpe. A ideia é dar sensação de impacto ("game feel"),
+  juntando pequenos efeitos que acontecem quase ao mesmo tempo.
+
+
+SLIDE 14 - PlayerStrike encadeia o golpe passo a passo
+------------------------------------------------------
+O que dizer (siga os cartões da direita):
+1. Antecipação: o herói se achata um pouco, como quem pega impulso, e o Animator toca o ataque.
+2. Dash: avança rápido até o inimigo (0,12 segundo).
+3. Corte: um arco com rastro, feito com TrailRenderer.
+4. Impacto: som, inimigo pisca branco, faíscas, número de dano subindo e a tela treme.
+5. Hit-stop: o jogo congela por 70 milissegundos. É curto, mas dá peso ao golpe.
+6. Golpe final: câmera lenta para marcar a derrota do inimigo.
+- Quando o jogador erra, o EnemyStrike faz o contrário: o inimigo avança e o herói pisca vermelho.
+
+Em termos simples:
+- Nenhum efeito sozinho impressiona; o que dá impacto é a combinação de todos em menos de meio segundo.
+
+
+SLIDE 15 - Tempo real para o efeito não parar sozinho
+-----------------------------------------------------
+O que dizer:
+- Mover é a função que desliza um objeto de um ponto a outro.
+  A curva EaseOutCubic começa rápida e freia no fim, por isso o dash parece um bote.
+- HitStop zera o Time.timeScale (o "relógio" do jogo), espera e volta ao normal.
+- Detalhe importante: as animações usam o tempo real (unscaledDeltaTime).
+  Se usassem o tempo normal, elas também congelariam durante o hit-stop.
+- Por segurança, ao carregar uma cena o jogo sempre volta o relógio para a velocidade normal.
+
+Em termos simples:
+- Time.timeScale = velocidade do jogo. 1 é normal, 0 é pausado, 0,3 é câmera lenta.
+
+
+SLIDE 16 - Animator: clipes criados por código
+----------------------------------------------
+O que dizer:
+- Os desenhos da Kenney têm só um quadro. Então a animação é feita mexendo no desenho:
+  girar, achatar, esticar. O ataque gira o herói 25 graus para trás e 35 para frente.
+- Esses clipes e o Animator são criados por código, no JornadaSceneBuilder.
+- O gatilho "Attack" faz qualquer estado ir para a animação de ataque, e ela volta para Idle sozinha no fim.
+- O desenho fica num objeto filho chamado "Visual". Assim o Animator e o efeito de achatar
+  não brigam pela mesma escala.
+
+Em termos simples:
+- Animator = uma máquina de estados de animações, parecida com a do inimigo, só que visual.
+
+
+SLIDE 17 - Tópicos das aulas aplicados e testados
+-------------------------------------------------
+O que dizer:
+- Todos os tópicos vistos em aula aparecem no jogo; a tabela mostra onde.
+- 25 testes automáticos: 20 testam as regras e 5 carregam a fase de verdade e simulam
+  o combate, o Game Over e a troca de fase.
+- 30 perguntas conferidas no Python 3.14 e 3 fases com boss.
+- O código está no GitHub.
+- Encerrar abrindo o jogo para uma demonstração rápida, se houver tempo.
+
+
+PERGUNTAS QUE PODEM SURGIR
+==========================
+- "Usou IA?" -> Responda com sinceridade como foi o processo de desenvolvimento.
+- "O jogo executa Python?" -> Não. O jogador lê o código e escolhe a saída. As respostas foram
+  conferidas executando cada trecho no Python 3.14 antes, com o script tools/validate_questions.py.
+- "Por que corrotina e não Update?" -> O combate tem etapas com espera (esperar resposta, esperar animação).
+  A corrotina escreve isso em ordem, de cima para baixo, sem precisar de vários if e contadores.
+- "Como os assets foram usados?" -> Packs gratuitos da Kenney, licença CC0, creditados na tela de Créditos.
+- "Como funciona o Game Over?" -> Cada erro tira coração (5 por fase). Com 0, o GameManager mostra a tela
+  de Game Over, com "Tentar de novo" e "Menu".
+- "Como as cenas foram montadas?" -> Um script de editor (JornadaSceneBuilder) monta as 5 cenas por código.
+  Isso permite recriar tudo igual e versionar no Git.
