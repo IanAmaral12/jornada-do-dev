@@ -11,8 +11,15 @@ public class TaskPanel : MonoBehaviour
     [SerializeField] Text codigo;
     [SerializeField] Button[] botoes;
     [SerializeField] Text feedback;
+    [SerializeField] AudioSource audioSource;
+    [SerializeField] AudioClip sfxClique;
+    [SerializeField] AudioClip sfxCorreto;
+    [SerializeField] AudioClip sfxErrado;
 
     public event Action<int> Answered;
+
+    public PythonQuestion PerguntaAtual { get; private set; }
+    public bool AguardandoResposta => !travado && raiz.activeSelf;
 
     PlayerControls controles;
     bool travado = true;
@@ -58,6 +65,7 @@ public class TaskPanel : MonoBehaviour
     public void Show(string nomeInimigo, PythonQuestion q)
     {
         raiz.SetActive(true);
+        PerguntaAtual = q;
         titulo.text = nomeInimigo;
         enunciado.text = q.prompt;
         codigo.text = PythonHighlighter.Highlight(q.code);
@@ -78,6 +86,7 @@ public class TaskPanel : MonoBehaviour
 
     public void ShowFeedback(bool correct, string explanation)
     {
+        Tocar(correct ? sfxCorreto : sfxErrado);
         feedback.text = correct
             ? "<color=#50fa7b>Correto! Golpe certeiro.</color>"
             : $"<color=#ff5555>Errado!</color> {explanation}";
@@ -89,10 +98,16 @@ public class TaskPanel : MonoBehaviour
         raiz.SetActive(false);
     }
 
-    void Responder(int indice)
+    public void Responder(int indice)
     {
         if (travado || !raiz.activeSelf) return;
         Lock();
+        Tocar(sfxClique);
         Answered?.Invoke(indice);
+    }
+
+    void Tocar(AudioClip clip)
+    {
+        if (clip && audioSource) audioSource.PlayOneShot(clip);
     }
 }

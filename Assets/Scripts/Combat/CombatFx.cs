@@ -4,6 +4,8 @@ using UnityEngine;
 public class CombatFx : MonoBehaviour
 {
     [SerializeField] Material flashMaterial;
+    [SerializeField] Material spriteMaterial;
+    [SerializeField] Font fonteNumeros;
     [SerializeField] AudioSource audioSource;
     [SerializeField] AudioClip sfxSwing;
     [SerializeField] AudioClip sfxHit;
@@ -18,9 +20,9 @@ public class CombatFx : MonoBehaviour
 
     void Awake()
     {
-        var spriteMat = new Material(Shader.Find("Sprites/Default"));
-        faiscas = CriarFaiscas(spriteMat);
-        CriarCorte(spriteMat);
+        DamageNumber.FontePadrao = fonteNumeros;
+        faiscas = CriarFaiscas(spriteMaterial);
+        CriarCorte(spriteMaterial);
     }
 
     void OnDisable() => Time.timeScale = 1f;
@@ -42,7 +44,7 @@ public class CombatFx : MonoBehaviour
         yield return Corte(enemy.transform.position, lado);
 
         Tocar(finisher ? sfxFinisher : sfxHit);
-        StartCoroutine(Flash(enemy.GetComponent<SpriteRenderer>(), 2));
+        StartCoroutine(Flash(enemy.GetComponentInChildren<SpriteRenderer>(), 2));
         faiscas.transform.position = enemy.transform.position;
         faiscas.Emit(finisher ? 24 : 12);
         DamageNumber.Spawn(enemy.transform.position + Vector3.up * 0.8f, "-" + damage, corDano);
@@ -72,7 +74,7 @@ public class CombatFx : MonoBehaviour
         HudController.Instancia?.Tremer();
         yield return HitStop(0.06f);
         StartCoroutine(Mover(player, player.position, player.position - new Vector3(lado * 0.3f, 0f, 0f), 0.1f));
-        yield return PiscarVermelho(player.GetComponent<SpriteRenderer>(), 3);
+        yield return PiscarVermelho(player.GetComponentInChildren<SpriteRenderer>(), 3);
 
         yield return Mover(enemy.transform, enemy.transform.position, origem, 0.15f);
     }

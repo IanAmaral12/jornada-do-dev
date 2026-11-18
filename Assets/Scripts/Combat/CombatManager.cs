@@ -6,7 +6,8 @@ public class CombatManager : MonoBehaviour
     [SerializeField] PlayerController player;
     [SerializeField] TaskPanel taskPanel;
     [SerializeField] CombatFx fx;
-    [SerializeField] float tempoExplicacao = 1.8f;
+    [SerializeField] float tempoAcerto = 0.6f;
+    [SerializeField] float tempoExplicacao = 2.5f;
 
     public static CombatManager Instancia { get; private set; }
 
@@ -50,18 +51,17 @@ public class CombatManager : MonoBehaviour
             resultado = encontro.Answer(resposta.Value);
             bool acertou = resultado is AnswerOutcome.Hit or AnswerOutcome.EnemyDefeated;
             taskPanel.ShowFeedback(acertou, q.explanation);
+            yield return new WaitForSecondsRealtime(acertou ? tempoAcerto : tempoExplicacao);
 
+            // o painel sai da frente para o golpe aparecer inteiro
+            taskPanel.Hide();
             if (acertou)
                 yield return fx.PlayerStrike(player.transform, e, 1, resultado == AnswerOutcome.EnemyDefeated);
             else
-            {
                 yield return fx.EnemyStrike(e, player.transform, e.damageToPlayer);
-                if (resultado == AnswerOutcome.Miss)
-                    yield return new WaitForSecondsRealtime(tempoExplicacao);
-            }
+            yield return new WaitForSecondsRealtime(0.3f);
         }
 
-        taskPanel.Hide();
         HudController.Instancia?.EsconderInimigo();
         InCombat = false;
 

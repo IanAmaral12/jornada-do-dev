@@ -8,7 +8,7 @@ public class PlayerCombatAnimator : MonoBehaviour
 
     void Awake()
     {
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         escalaBase = transform.localScale;
     }
 
