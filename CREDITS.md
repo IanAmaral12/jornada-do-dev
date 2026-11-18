@@ -2,7 +2,7 @@
 
 ## Desenvolvimento
 
-- (integrantes do grupo)
+- Ian Felipe Amaral Oliveira Silva
 
 ## Arte, fontes e áudio
 

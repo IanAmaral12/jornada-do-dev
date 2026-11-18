@@ -79,7 +79,7 @@ public static class JornadaSceneBuilder
         Physics2D.IgnoreLayerCollision(LayerEnemy, LayerEnemy, true);
 
         PlayerSettings.productName = "Jornada do Dev";
-        PlayerSettings.companyName = "Grupo P2";
+        PlayerSettings.companyName = "Ian Felipe Amaral Oliveira Silva";
         PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
         PlayerSettings.defaultScreenWidth = 1280;
         PlayerSettings.defaultScreenHeight = 720;
@@ -754,7 +754,7 @@ public static class JornadaSceneBuilder
         Texto(Rect("Titulo", raiz, c, c, new Vector2(0, 280), new Vector2(1200, 90)), "CRÉDITOS", 80, new Color(1f, 0.85f, 0.3f));
         Texto(Rect("Texto", raiz, c, c, new Vector2(0, 20), new Vector2(1100, 420)),
             "<b>Jornada do Dev</b>\nProjeto prático P2 - Desenvolvimento de Jogos Digitais - UNISAGRADO\n\n" +
-            "<color=#ffd84d>Desenvolvimento</color>\n(integrantes do grupo)\n\n" +
+            "<color=#ffd84d>Desenvolvimento</color>\nIan Felipe Amaral Oliveira Silva\n\n" +
             "<color=#ffd84d>Arte, fontes e áudio</color>\nKenney (www.kenney.nl) - licença Creative Commons CC0\n" +
             "Tiny Dungeon, Pixel Platformer, Impact Sounds, Interface Sounds, Music Jingles e Kenney Fonts\n\n" +
             "<color=#ffd84d>Feito com</color>\nUnity 6.3 LTS - tasks em Python 3.14",

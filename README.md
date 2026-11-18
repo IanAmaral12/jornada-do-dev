@@ -6,9 +6,9 @@ Projeto prático da P2 da disciplina Desenvolvimento de Jogos Digitais (Ciência
 
 ![Combate](docs/img/senior-combate.png)
 
-## Integrantes
+## Integrante
 
-- (preencher com o nome dos integrantes do grupo)
+- Ian Felipe Amaral Oliveira Silva (desenvolvimento individual)
 
 ## Como jogar (executável)
 
